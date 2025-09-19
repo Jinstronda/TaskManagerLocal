@@ -210,10 +210,24 @@ export class PerformanceMonitor {
     this.memoryCheckInterval = setInterval(() => {
       const usage = this.getCurrentMemoryUsage();
       this.recordMetric('memoryUsage', usage.rss);
-      
+
       // Log memory usage if it's getting high (>70MB)
       if (usage.rss > 70 * 1024 * 1024) {
         logger.warn(`High memory usage detected: ${this.getFormattedMemoryUsage()}`);
+
+        // Trigger garbage collection if available and memory is very high (>150MB)
+        if (usage.rss > 150 * 1024 * 1024 && global.gc) {
+          try {
+            global.gc();
+            const newUsage = this.getCurrentMemoryUsage();
+            const rssReduced = Math.round((usage.rss - newUsage.rss) / 1024 / 1024 * 100) / 100;
+            logger.info(`Garbage collection triggered, freed ${rssReduced}MB`);
+          } catch (error) {
+            logger.warn('Garbage collection failed:', error);
+          }
+        } else if (usage.rss > 150 * 1024 * 1024) {
+          logger.debug('Garbage collection not available (run with --expose-gc flag)');
+        }
       }
     }, 30000);
   }

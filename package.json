@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "dev:smart": "node scripts/smart-dev.js",
-    "server:dev": "nodemon --exec ts-node src/server/index.ts",
+    "server:dev": "nodemon --exec \"node --expose-gc --max-old-space-size=400 -r ts-node/register src/server/index.ts\"",
     "client:dev": "cd src/client && npm run dev",
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc -p tsconfig.server.json",
