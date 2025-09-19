@@ -1,0 +1,20 @@
+{
+  "ignore": [
+    "*.json",
+    "*.lock",
+    "node_modules",
+    "dist",
+    "database",
+    "logs",
+    "*.log",
+    "src/client",
+    "TaskManagerLocal",
+    ".app-instance.lock",
+    "port-config.json"
+  ],
+  "ext": "ts",
+  "watch": [
+    "src/server",
+    "src/shared"
+  ]
+}
