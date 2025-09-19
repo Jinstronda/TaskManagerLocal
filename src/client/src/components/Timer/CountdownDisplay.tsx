@@ -17,22 +17,39 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('text-center', className)}>
+    <div className={cn('text-center w-full h-full flex flex-col items-center justify-center', className)}>
+      {/* Timer Display Container with proper constraints */}
       <div
-        className={cn(
-          'font-mono font-bold transition-all duration-300',
-          'text-8xl md:text-9xl lg:text-[8rem]', // Minimum 120px font size
-          {
-            'text-gray-800 dark:text-gray-200': !isRunning,
-            'animate-pulse': isPaused,
-          }
-        )}
+        className="relative flex items-center justify-center w-full max-w-[280px] h-[120px] px-4"
         style={{
-          color: isRunning ? color : undefined,
-          textShadow: isRunning ? `0 0 20px ${color}40` : undefined,
+          // Ensure timer fits within the progress ring with proper padding
+          maxWidth: '280px', // 320px ring - 20px padding on each side
         }}
       >
-        {time}
+        <div
+          className={cn(
+            'font-mono font-bold transition-all duration-300',
+            'leading-none text-center overflow-hidden',
+            // Responsive font sizing using CSS clamp() for fluid scaling
+            'tabular-nums', // Ensure consistent character width for numbers
+            {
+              'text-gray-800 dark:text-gray-200': !isRunning,
+              'animate-pulse': isPaused,
+            }
+          )}
+          style={{
+            // Fluid font size that scales properly within container
+            fontSize: 'clamp(3rem, 8vw, 5.5rem)', // Min 48px, scales with viewport, max 88px
+            color: isRunning ? color : undefined,
+            textShadow: isRunning ? `0 0 20px ${color}40` : undefined,
+            // Ensure text fits container width
+            maxWidth: '100%',
+            // Prevent text overflow and layout shifts
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {time}
+        </div>
       </div>
       
       {/* Status indicator */}

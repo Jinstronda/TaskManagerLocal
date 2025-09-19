@@ -77,13 +77,6 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
           />
         )}
       </svg>
-      
-      {/* Progress percentage indicator */}
-      <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full px-3 py-1 shadow-lg">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {Math.round(progress)}%
-        </span>
-      </div>
     </div>
   );
 };

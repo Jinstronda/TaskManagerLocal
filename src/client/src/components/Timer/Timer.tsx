@@ -84,21 +84,25 @@ export const Timer: React.FC = () => {
 
         {/* Progress Ring and Countdown */}
         <div className="relative flex items-center justify-center mb-12">
-          <ProgressRing
-            progress={progress}
-            color={sessionTypeColor}
-            size={320}
-            strokeWidth={8}
-            isRunning={isRunning}
-            isPaused={isPaused}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <CountdownDisplay
-              time={formattedTime}
+          {/* Progress Ring Container with proper positioning */}
+          <div className="relative">
+            <ProgressRing
+              progress={progress}
+              color={sessionTypeColor}
+              size={320}
+              strokeWidth={8}
               isRunning={isRunning}
               isPaused={isPaused}
-              color={sessionTypeColor}
             />
+            {/* Countdown Display positioned precisely in center of ring */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <CountdownDisplay
+                time={formattedTime}
+                isRunning={isRunning}
+                isPaused={isPaused}
+                color={sessionTypeColor}
+              />
+            </div>
           </div>
         </div>
 
