@@ -7,13 +7,14 @@ dist/
 src/client/dist/
 build/
 
-# Database
+# Database files (potential personal data)
 database/
 *.db
 *.db-shm
 *.db-wal
+local_task_tracker.db
 
-# Logs
+# Logs (may contain personal data)
 logs/
 *.log
 npm-debug.log*
@@ -51,12 +52,34 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# Environment variables (credentials and personal config)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+port-config.json
+
+# Personal debugging and testing files
+*debug*.js
+*debug*.png
+*debug*.md
+debug-*
+test-*.js
+test-*.png
+test-*.md
+api-test.js
+comprehensive-test.js
+quick-test.js
+inspect-*.js
+timer-ui-inspection.png
+categories-debug.png
+categories-page.png
+UI.png
+
+# App instance and session files
+.app-instance.lock
+.kiro/
 
 # IDE files
 .vscode/
@@ -85,3 +108,9 @@ daemon/
 tmp/
 temp/
 nul
+
+# Personal documentation and analysis files
+INSTANCE-MANAGEMENT.md
+
+# Claude configuration (may contain personal context)
+.claude/
