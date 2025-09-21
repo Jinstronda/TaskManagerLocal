@@ -1,0 +1,59 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Task Tracker" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Local Productivity App
+    - navigation [ref=e9]:
+      - link "Dashboard" [ref=e10] [cursor=pointer]:
+        - /url: /
+        - img [ref=e11] [cursor=pointer]
+        - text: Dashboard
+      - link "Timer" [ref=e14] [cursor=pointer]:
+        - /url: /timer
+        - img [ref=e15] [cursor=pointer]
+        - text: Timer
+      - link "Tasks" [ref=e18] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e19] [cursor=pointer]
+        - text: Tasks
+      - link "Categories" [ref=e22] [cursor=pointer]:
+        - /url: /categories
+        - img [ref=e23] [cursor=pointer]
+        - text: Categories
+      - link "Analytics" [ref=e25] [cursor=pointer]:
+        - /url: /analytics
+        - img [ref=e26] [cursor=pointer]
+        - text: Analytics
+      - link "Habits" [ref=e28] [cursor=pointer]:
+        - /url: /habits
+        - img [ref=e29] [cursor=pointer]
+        - text: Habits
+      - link "Settings" [ref=e31] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e32] [cursor=pointer]
+        - text: Settings
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - heading "Dashboard" [level=1] [ref=e39]
+        - paragraph [ref=e40]: Welcome to your productivity overview
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "Today's Focus Time" [level=3] [ref=e43]
+          - paragraph [ref=e44]: 0h 0m
+        - generic [ref=e45]:
+          - heading "Sessions Completed" [level=3] [ref=e46]
+          - paragraph [ref=e47]: "0"
+        - generic [ref=e48]:
+          - heading "Current Streak" [level=3] [ref=e49]
+          - paragraph [ref=e50]: 0 days
+        - generic [ref=e51]:
+          - heading "Focus Score" [level=3] [ref=e52]
+          - paragraph [ref=e53]: "0"
+      - generic [ref=e54]:
+        - heading "Quick Start" [level=2] [ref=e55]
+        - paragraph [ref=e56]: Start your first focus session by navigating to the Timer page.
+```

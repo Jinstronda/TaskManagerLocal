@@ -107,7 +107,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
   const handleCreateCategory = async () => {
     if (!newCategoryName.trim()) return;
-    
+
     setIsCreatingCategory(true);
     try {
       const newCategory = await createCategory({
@@ -116,19 +116,34 @@ const TaskForm: React.FC<TaskFormProps> = ({
         description: '',
         weeklyGoal: 0
       });
-      
-      // Set the newly created category as selected
-      setFormData(prev => ({ ...prev, categoryId: newCategory.id }));
-      
-      // Reset form
-      setNewCategoryName('');
-      setNewCategoryColor('#3B82F6');
-      setShowCategoryForm(false);
-      
-      // Refresh categories
-      await fetchCategories();
+
+      // Validate that category was created successfully before using it
+      if (newCategory && newCategory.id) {
+        // Set the newly created category as selected
+        setFormData(prev => ({ ...prev, categoryId: newCategory.id }));
+
+        // Reset form
+        setNewCategoryName('');
+        setNewCategoryColor('#3B82F6');
+        setShowCategoryForm(false);
+
+        // Refresh categories
+        await fetchCategories();
+      } else {
+        console.error('Category creation failed: No category returned or missing ID');
+        // Show user-friendly error message
+        setErrors(prev => ({
+          ...prev,
+          categoryId: 'Failed to create category. Please try again.'
+        }));
+      }
     } catch (error) {
       console.error('Failed to create category:', error);
+      // Show user-friendly error message
+      setErrors(prev => ({
+        ...prev,
+        categoryId: 'Failed to create category. Please check your connection and try again.'
+      }));
     } finally {
       setIsCreatingCategory(false);
     }

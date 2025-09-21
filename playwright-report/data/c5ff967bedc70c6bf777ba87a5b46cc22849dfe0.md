@@ -1,0 +1,93 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Task Tracker" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Local Productivity App
+    - navigation [ref=e9]:
+      - link "Dashboard" [ref=e10]:
+        - /url: /
+        - img [ref=e11]
+        - text: Dashboard
+      - link "Timer" [ref=e14]:
+        - /url: /timer
+        - img [ref=e15]
+        - text: Timer
+      - link "Tasks" [ref=e18]:
+        - /url: /tasks
+        - img [ref=e19]
+        - text: Tasks
+      - link "Categories" [ref=e22]:
+        - /url: /categories
+        - img [ref=e23]
+        - text: Categories
+      - link "Analytics" [ref=e25]:
+        - /url: /analytics
+        - img [ref=e26]
+        - text: Analytics
+      - link "Habits" [ref=e28]:
+        - /url: /habits
+        - img [ref=e29]
+        - text: Habits
+      - link "Settings" [ref=e31]:
+        - /url: /settings
+        - img [ref=e32]
+        - text: Settings
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Tasks" [level=1] [ref=e40]
+          - paragraph [ref=e41]: Manage your tasks and track your progress
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - button "List view" [ref=e44] [cursor=pointer]:
+              - img [ref=e45] [cursor=pointer]
+            - button "Group by category" [ref=e46] [cursor=pointer]:
+              - img [ref=e47] [cursor=pointer]
+          - button "Add Task" [ref=e52] [cursor=pointer]:
+            - img [ref=e53] [cursor=pointer]
+            - generic [ref=e54] [cursor=pointer]: Add Task
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - img [ref=e57]
+          - textbox "Search tasks..." [ref=e60]
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - img [ref=e63]
+            - generic [ref=e65]: "Filters:"
+          - generic [ref=e66]:
+            - generic [ref=e67]: "Category:"
+            - combobox "Category:" [ref=e68]:
+              - option "All Categories" [selected]
+          - generic [ref=e69]:
+            - generic [ref=e70]: "Status:"
+            - combobox "Status:" [ref=e71]:
+              - option "All Status" [selected]
+              - option "Active"
+              - option "Completed"
+              - option "Archived"
+          - generic [ref=e72]:
+            - generic [ref=e73]: "Priority:"
+            - combobox "Priority:" [ref=e74]:
+              - option "All Priorities" [selected]
+              - option "High"
+              - option "Medium"
+              - option "Low"
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: "0"
+            - generic [ref=e78]: Total
+          - generic [ref=e79]:
+            - generic [ref=e81]: "0"
+            - generic [ref=e82]: Active
+          - generic [ref=e83]:
+            - generic [ref=e85]: "0"
+            - generic [ref=e86]: Completed
+          - generic [ref=e87]:
+            - generic [ref=e89]: "0"
+            - generic [ref=e90]: Archived
+      - generic [ref=e94]: Loading tasks...
+```
