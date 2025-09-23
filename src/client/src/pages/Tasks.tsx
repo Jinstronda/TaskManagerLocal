@@ -113,22 +113,22 @@ const Tasks: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-          <p className="text-gray-600 mt-1">Manage your tasks and track your progress</p>
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Tasks</h1>
+          <p className="text-neutral-600">Manage your tasks and track your progress</p>
         </div>
         <div className="flex items-center space-x-3">
           {/* View Toggle */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center bg-neutral-100 rounded-xl p-1 shadow-inner-soft">
             <button
               onClick={() => setGroupByCategory(false)}
-              className={`p-2 rounded-md transition-colors ${
-                !groupByCategory 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`p-2.5 rounded-lg transition-all duration-200 ${
+                !groupByCategory
+                  ? 'bg-white text-neutral-900 shadow-soft'
+                  : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
               }`}
               title="List view"
             >
@@ -136,10 +136,10 @@ const Tasks: React.FC = () => {
             </button>
             <button
               onClick={() => setGroupByCategory(true)}
-              className={`p-2 rounded-md transition-colors ${
-                groupByCategory 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`p-2.5 rounded-lg transition-all duration-200 ${
+                groupByCategory
+                  ? 'bg-white text-neutral-900 shadow-soft'
+                  : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
               }`}
               title="Group by category"
             >
@@ -150,9 +150,9 @@ const Tasks: React.FC = () => {
           {/* Add Task Button */}
           <button
             onClick={() => setIsTaskFormOpen(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-primary btn-md flex items-center space-x-2"
           >
-            <Plus size={20} />
+            <Plus size={18} />
             <span>Add Task</span>
           </button>
         </div>
@@ -166,14 +166,16 @@ const Tasks: React.FC = () => {
       />
 
       {/* Task List */}
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="card">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Loading tasks...</span>
+          <div className="flex items-center justify-center py-16">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-200 border-t-primary-600"></div>
+              <span className="text-sm text-neutral-600 font-medium">Loading tasks...</span>
+            </div>
           </div>
         ) : (
-          <div className="p-6">
+          <div className="p-8">
             <TaskList
               tasks={filteredTasks}
               onEditTask={setEditingTask}

@@ -26,10 +26,10 @@ const TaskList: React.FC<TaskListProps> = ({
 
   if (tasks.length === 0 && showEmptyState) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 mb-4">
+      <div className="text-center py-16 animate-fade-in">
+        <div className="text-neutral-300 mb-6">
           <svg
-            className="mx-auto h-12 w-12"
+            className="mx-auto h-16 w-16"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -37,14 +37,14 @@ const TaskList: React.FC<TaskListProps> = ({
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={1}
+              strokeWidth={1.5}
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
-        <p className="text-gray-500">
-          Create your first task to get started with time tracking.
+        <h3 className="text-xl font-semibold text-neutral-900 mb-3 tracking-tight">No tasks found</h3>
+        <p className="text-neutral-600 max-w-sm mx-auto leading-relaxed">
+          Create your first task to get started with organizing and tracking your work.
         </p>
       </div>
     );
@@ -57,48 +57,58 @@ const TaskList: React.FC<TaskListProps> = ({
     const archivedTasks = tasks.filter(task => task.status === 'archived');
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Active Tasks Section */}
         {activeTasks.length > 0 && (
-          <div className="space-y-3">
-            {activeTasks.map(task => (
-              <TaskItem
+          <div className="space-y-4 animate-slide-up">
+            {activeTasks.map((task, index) => (
+              <div
                 key={task.id}
-                task={task}
-                onEdit={onEditTask}
-                onDelete={onDeleteTask}
-                onComplete={onCompleteTask}
-                onStartSession={onStartSession}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Completed Tasks Section */}
-        {completedTasks.length > 0 && (
-          <div className="space-y-3">
-            {/* Completed Tasks Header */}
-            <div className="flex items-center space-x-3 pt-6 border-t border-gray-200">
-              <div className="w-4 h-4 rounded-full bg-green-500" />
-              <h3 className="text-lg font-semibold text-gray-700">
-                Completed Tasks
-              </h3>
-              <span className="text-sm text-gray-500">
-                ({completedTasks.length} task{completedTasks.length !== 1 ? 's' : ''})
-              </span>
-            </div>
-
-            {/* Completed Tasks List */}
-            <div className="space-y-3 opacity-75">
-              {completedTasks.map(task => (
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
                 <TaskItem
-                  key={task.id}
                   task={task}
                   onEdit={onEditTask}
                   onDelete={onDeleteTask}
                   onComplete={onCompleteTask}
                   onStartSession={onStartSession}
                 />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Completed Tasks Section */}
+        {completedTasks.length > 0 && (
+          <div className="space-y-4">
+            {/* Completed Tasks Header */}
+            <div className="flex items-center space-x-4 pt-8 border-t border-neutral-200">
+              <div className="w-5 h-5 rounded-full bg-success-500 shadow-soft" />
+              <h3 className="text-xl font-semibold text-neutral-700 tracking-tight">
+                Completed Tasks
+              </h3>
+              <span className="text-sm text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-full font-medium">
+                {completedTasks.length} task{completedTasks.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            {/* Completed Tasks List */}
+            <div className="space-y-4">
+              {completedTasks.map((task, index) => (
+                <div
+                  key={task.id}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <TaskItem
+                    task={task}
+                    onEdit={onEditTask}
+                    onDelete={onDeleteTask}
+                    onComplete={onCompleteTask}
+                    onStartSession={onStartSession}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -106,29 +116,34 @@ const TaskList: React.FC<TaskListProps> = ({
 
         {/* Archived Tasks Section */}
         {archivedTasks.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Archived Tasks Header */}
-            <div className="flex items-center space-x-3 pt-6 border-t border-gray-200">
-              <div className="w-4 h-4 rounded-full bg-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-600">
+            <div className="flex items-center space-x-4 pt-8 border-t border-neutral-200">
+              <div className="w-5 h-5 rounded-full bg-neutral-400 shadow-soft" />
+              <h3 className="text-xl font-semibold text-neutral-600 tracking-tight">
                 Archived Tasks
               </h3>
-              <span className="text-sm text-gray-500">
-                ({archivedTasks.length} task{archivedTasks.length !== 1 ? 's' : ''})
+              <span className="text-sm text-neutral-500 bg-neutral-100 px-2.5 py-1 rounded-full font-medium">
+                {archivedTasks.length} task{archivedTasks.length !== 1 ? 's' : ''}
               </span>
             </div>
 
             {/* Archived Tasks List */}
-            <div className="space-y-3 opacity-50">
-              {archivedTasks.map(task => (
-                <TaskItem
+            <div className="space-y-4 opacity-60">
+              {archivedTasks.map((task, index) => (
+                <div
                   key={task.id}
-                  task={task}
-                  onEdit={onEditTask}
-                  onDelete={onDeleteTask}
-                  onComplete={onCompleteTask}
-                  onStartSession={onStartSession}
-                />
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <TaskItem
+                    task={task}
+                    onEdit={onEditTask}
+                    onDelete={onDeleteTask}
+                    onComplete={onCompleteTask}
+                    onStartSession={onStartSession}
+                  />
+                </div>
               ))}
             </div>
           </div>

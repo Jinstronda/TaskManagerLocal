@@ -77,10 +77,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
   };
 
   return (
-    <div 
-      className={`group bg-white border rounded-lg p-4 hover:shadow-md transition-all duration-200 ${
-        task.status === 'completed' ? 'opacity-75' : ''
-      } ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}
+    <div
+      className={`group task-card card-interactive p-6 transition-all duration-300 ${
+        task.status === 'completed' ? 'opacity-70' : ''
+      } ${isOverdue ? 'border-danger-200 !bg-danger-25' : ''} ${
+        isDueToday && !isOverdue ? 'border-warning-200 !bg-warning-25' : ''
+      }`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -89,44 +91,44 @@ const TaskItem: React.FC<TaskItemProps> = ({
           {/* Completion Toggle */}
           <button
             onClick={() => onComplete(task)}
-            className={`mt-1 transition-colors ${
-              task.status === 'completed' 
-                ? 'text-green-600 hover:text-green-700' 
-                : 'text-gray-400 hover:text-green-600'
+            className={`mt-1.5 transition-all duration-200 hover:scale-110 ${
+              task.status === 'completed'
+                ? 'text-success-600 hover:text-success-700'
+                : 'text-neutral-300 hover:text-success-500'
             }`}
             disabled={task.status === 'archived'}
           >
             {task.status === 'completed' ? (
-              <CheckCircle2 size={20} />
+              <CheckCircle2 size={22} className="drop-shadow-sm" />
             ) : (
-              <Circle size={20} />
+              <Circle size={22} />
             )}
           </button>
 
           {/* Task Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-2 mb-1">
-              <h3 className={`font-medium text-gray-900 ${
-                task.status === 'completed' ? 'line-through' : ''
+            <div className="flex items-center space-x-3 mb-2">
+              <h3 className={`font-semibold text-neutral-900 text-lg tracking-tight ${
+                task.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 {task.title}
               </h3>
-              
+
               {/* Priority Badge */}
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+              <span className={`status-indicator priority-${task.priority} text-xs font-semibold`}>
                 {task.priority}
               </span>
 
               {/* Overdue/Due Today Indicators */}
               {isOverdue && (
-                <span className="flex items-center text-red-600 text-xs">
-                  <AlertTriangle size={14} className="mr-1" />
+                <span className="flex items-center text-danger-600 text-xs font-medium bg-danger-100 px-2 py-1 rounded-lg">
+                  <AlertTriangle size={12} className="mr-1" />
                   Overdue
                 </span>
               )}
               {isDueToday && !isOverdue && (
-                <span className="flex items-center text-orange-600 text-xs">
-                  <Calendar size={14} className="mr-1" />
+                <span className="flex items-center text-warning-600 text-xs font-medium bg-warning-100 px-2 py-1 rounded-lg">
+                  <Calendar size={12} className="mr-1" />
                   Due Today
                 </span>
               )}
@@ -134,37 +136,39 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
             {/* Description */}
             {task.description && (
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+              <p className="text-neutral-600 mb-3 line-clamp-2 leading-relaxed">
                 {task.description}
               </p>
             )}
 
             {/* Task Meta Information */}
-            <div className="flex items-center space-x-4 text-xs text-gray-500">
+            <div className="flex items-center space-x-4 text-sm text-neutral-500">
               {/* Category */}
               {category && (
-                <div className="flex items-center space-x-1">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
+                <div className="flex items-center space-x-2">
+                  <div
+                    className="w-3 h-3 rounded-full shadow-sm"
                     style={{ backgroundColor: category.color }}
                   />
-                  <span>{category.name}</span>
+                  <span className="font-medium">{category.name}</span>
                 </div>
               )}
 
               {/* Duration Info */}
               {(task.estimatedDuration || task.actualDuration > 0) && (
-                <div className="flex items-center space-x-1">
-                  <Clock size={12} />
+                <div className="flex items-center space-x-2">
+                  <Clock size={14} />
                   <span>
                     {task.actualDuration > 0 && (
-                      <span className="text-green-600 font-medium">
+                      <span className="text-success-600 font-semibold">
                         {formatDuration(task.actualDuration)}
                       </span>
                     )}
-                    {task.estimatedDuration && task.actualDuration > 0 && ' / '}
+                    {task.estimatedDuration && task.actualDuration > 0 && (
+                      <span className="text-neutral-400 mx-1">/</span>
+                    )}
                     {task.estimatedDuration && (
-                      <span>
+                      <span className="text-neutral-600">
                         {formatDuration(task.estimatedDuration)} est.
                       </span>
                     )}
@@ -174,16 +178,16 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
               {/* Due Date */}
               {task.dueDate && (
-                <div className="flex items-center space-x-1">
-                  <Calendar size={12} />
-                  <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                <div className="flex items-center space-x-2">
+                  <Calendar size={14} />
+                  <span className={isOverdue ? 'text-danger-600 font-semibold' : 'font-medium'}>
                     {formatDate(task.dueDate)}
                   </span>
                 </div>
               )}
 
               {/* Status */}
-              <span className={`font-medium ${getStatusColor(task.status)}`}>
+              <span className={`status-${task.status} text-xs`}>
                 {task.status}
               </span>
             </div>
@@ -191,14 +195,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className={`flex items-center space-x-1 transition-opacity ${
-          showActions ? 'opacity-100' : 'opacity-0'
+        <div className={`flex items-center space-x-2 transition-all duration-300 ${
+          showActions ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         }`}>
           {/* Start Session Button */}
           {task.status === 'active' && onStartSession && (
             <button
               onClick={() => onStartSession(task)}
-              className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
+              className="p-2.5 text-success-600 hover:text-success-700 hover:bg-success-50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-soft"
               title="Start focus session"
             >
               <Play size={16} />
@@ -209,7 +213,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           {task.status !== 'archived' && (
             <button
               onClick={() => onEdit(task)}
-              className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+              className="p-2.5 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-soft"
               title="Edit task"
             >
               <Edit3 size={16} />
@@ -219,7 +223,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           {/* Delete Button */}
           <button
             onClick={() => onDelete(task)}
-            className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            className="p-2.5 text-danger-500 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-soft"
             title="Delete task"
           >
             <Trash2 size={16} />
