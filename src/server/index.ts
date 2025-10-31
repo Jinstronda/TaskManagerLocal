@@ -253,7 +253,7 @@ app.get('*', (req, res) => {
       
       // Auto-launch Neutralino UI when running as packaged exe
       // Detect if we're running from dist-exe (packaged) vs dev environment
-      const isPackaged = __dirname.includes('dist-exe') || process.pkg !== undefined;
+      const isPackaged = __dirname.includes('dist-exe') || (process as any).pkg !== undefined;
       if (isPackaged) {
         setTimeout(() => launchNeutralinoUI(), 1000); // Wait 1s for server to be ready
       }
