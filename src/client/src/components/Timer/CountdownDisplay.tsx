@@ -9,7 +9,7 @@ interface CountdownDisplayProps {
   className?: string;
 }
 
-export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
+export const CountdownDisplay: React.FC<CountdownDisplayProps> = React.memo(({
   time,
   isRunning,
   isPaused,
@@ -86,4 +86,6 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
       </div>
     </div>
   );
-};
+});
+
+CountdownDisplay.displayName = 'CountdownDisplay';

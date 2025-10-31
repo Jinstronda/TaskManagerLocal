@@ -1,0 +1,10 @@
+{
+  "name": "sqlite-extension",
+  "version": "1.0.0",
+  "description": "SQLite database extension for Task Tracker",
+  "main": "main.js",
+  "dependencies": {
+    "@neutralinojs/lib": "^1.9.0",
+    "better-sqlite3": "^11.0.0"
+  }
+}

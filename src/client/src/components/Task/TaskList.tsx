@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Task } from '../../../../shared/types';
 import TaskItem from './TaskItem';
 import { useCategoryStore } from '../../stores/categoryStore';
@@ -13,7 +13,7 @@ interface TaskListProps {
   showEmptyState?: boolean;
 }
 
-const TaskList: React.FC<TaskListProps> = ({
+const TaskList: React.FC<TaskListProps> = React.memo(({
   tasks,
   onEditTask,
   onDeleteTask,
@@ -23,6 +23,25 @@ const TaskList: React.FC<TaskListProps> = ({
   showEmptyState = true
 }) => {
   const { categories } = useCategoryStore();
+
+  // Memoize task categorization to prevent unnecessary recalculations
+  const { activeTasks, completedTasks, archivedTasks } = useMemo(() => ({
+    activeTasks: tasks.filter(task => task.status === 'active'),
+    completedTasks: tasks.filter(task => task.status === 'completed'),
+    archivedTasks: tasks.filter(task => task.status === 'archived')
+  }), [tasks]);
+
+  // Memoize category grouping function
+  const groupTasksByCategory = useCallback((taskList: Task[]) => {
+    return taskList.reduce((acc, task) => {
+      const categoryId = task.categoryId;
+      if (!acc[categoryId]) {
+        acc[categoryId] = [];
+      }
+      acc[categoryId].push(task);
+      return acc;
+    }, {} as Record<number, Task[]>);
+  }, []);
 
   if (tasks.length === 0 && showEmptyState) {
     return (
@@ -51,11 +70,6 @@ const TaskList: React.FC<TaskListProps> = ({
   }
 
   if (!groupByCategory) {
-    // Separate active and completed tasks
-    const activeTasks = tasks.filter(task => task.status === 'active');
-    const completedTasks = tasks.filter(task => task.status === 'completed');
-    const archivedTasks = tasks.filter(task => task.status === 'archived');
-
     return (
       <div className="space-y-8">
         {/* Active Tasks Section */}
@@ -152,24 +166,7 @@ const TaskList: React.FC<TaskListProps> = ({
     );
   }
 
-  // Separate tasks by status first
-  const activeTasks = tasks.filter(task => task.status === 'active');
-  const completedTasks = tasks.filter(task => task.status === 'completed');
-  const archivedTasks = tasks.filter(task => task.status === 'archived');
-
-  // Group tasks by category for each status
-  const groupTasksByCategory = (taskList: Task[]) => {
-    return taskList.reduce((acc, task) => {
-      const categoryId = task.categoryId;
-      if (!acc[categoryId]) {
-        acc[categoryId] = [];
-      }
-      acc[categoryId].push(task);
-      return acc;
-    }, {} as Record<number, Task[]>);
-  };
-
-  const renderCategorySection = (tasksByCategory: Record<number, Task[]>, sectionOpacity = "opacity-100") => {
+  const renderCategorySection = useCallback((tasksByCategory: Record<number, Task[]>, sectionOpacity = "opacity-100") => {
     // Sort categories by name
     const sortedCategoryIds = Object.keys(tasksByCategory)
       .map(id => parseInt(id))
@@ -217,7 +214,7 @@ const TaskList: React.FC<TaskListProps> = ({
         </div>
       );
     });
-  };
+  }, [categories]);
 
   return (
     <div className="space-y-6">
@@ -263,6 +260,8 @@ const TaskList: React.FC<TaskListProps> = ({
       )}
     </div>
   );
-};
+});
+
+TaskList.displayName = 'TaskList';
 
 export default TaskList;

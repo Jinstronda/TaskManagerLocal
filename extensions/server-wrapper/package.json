@@ -1,0 +1,7 @@
+{
+  "name": "server-wrapper",
+  "version": "1.0.0",
+  "description": "Wrapper to start Express server with Neutralino app",
+  "main": "main.js",
+  "dependencies": {}
+}

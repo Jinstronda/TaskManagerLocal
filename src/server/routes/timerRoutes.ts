@@ -25,27 +25,45 @@ export function createTimerRoutes(
 
       logger.info(`Timer start request - sessionType: ${sessionType}, plannedDuration: ${plannedDuration}, taskId: ${taskId}, categoryId: ${categoryId}, clientId: ${clientId}`);
 
-      // If no categoryId provided, get the first available category
-      let finalCategoryId = categoryId;
+      // Resolve category: validate provided id or fallback to first or create default
+      const categoryRepository = new CategoryRepository();
+      let finalCategoryId = Number.isFinite(Number(categoryId)) ? Number(categoryId) : undefined;
+      if (finalCategoryId) {
+        const exists = await categoryRepository.findById(finalCategoryId);
+        if (!exists) {
+          finalCategoryId = undefined;
+        }
+      }
       if (!finalCategoryId) {
-        const categoryRepository = new CategoryRepository();
         const categories = await categoryRepository.findAll();
         if (categories.length > 0 && categories[0]) {
           finalCategoryId = categories[0].id;
         } else {
-          throw new Error('No categories available. Please create a category first.');
+          // Create a default category if none exist
+          const created = await categoryRepository.create({
+            name: 'General',
+            color: '#888888',
+            weeklyGoal: 0
+          } as any);
+          finalCategoryId = created.id;
         }
       }
 
       logger.info(`Using finalCategoryId: ${finalCategoryId}`);
 
-      // Create session in database
+      // Normalize inputs and create session in database
+      const allowedTypes = new Set(['deep_work', 'quick_task', 'break', 'custom']);
+      const normalizedType = allowedTypes.has(sessionType) ? sessionType : 'custom';
+      const normalizedPlanned = Number.isFinite(Number(plannedDuration)) && Number(plannedDuration) > 0
+        ? Math.round(Number(plannedDuration))
+        : 25;
+
       const session = await sessionRepository.create({
-        taskId: taskId || null, // Ensure null instead of undefined for SQLite
-        categoryId: finalCategoryId,
-        sessionType,
+        taskId: taskId ?? null,
+        categoryId: finalCategoryId!,
+        sessionType: normalizedType as any,
         startTime: new Date(),
-        plannedDuration,
+        plannedDuration: normalizedPlanned,
         completed: false,
       });
 

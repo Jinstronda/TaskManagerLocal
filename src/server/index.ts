@@ -42,6 +42,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
+      connectSrc: ["'self'", "http://localhost:*", "http://127.0.0.1:*"] ,
       imgSrc: ["'self'", "data:", "https:"],
     },
   },
@@ -55,22 +56,22 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// CORS configuration for localhost development
+// CORS configuration for localhost development and Neutralino internal server
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://localhost:3001', 
-    'http://localhost:3002', 
-    'http://localhost:3003',
-    'http://localhost:3004',
-    'http://localhost:3005',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    'http://127.0.0.1:3002',
-    'http://127.0.0.1:3003',
-    'http://127.0.0.1:3004',
-    'http://127.0.0.1:3005'
-  ],
+  origin(origin, callback) {
+    // Allow requests without an Origin (like curl or same-origin)
+    if (!origin) return callback(null, true);
+
+    const allowPatterns = [
+      /^http:\/\/localhost:\d+$/,
+      /^http:\/\/127\.0\.0\.1:\d+$/
+    ];
+
+    if (allowPatterns.some((re) => re.test(origin))) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 
@@ -92,8 +93,43 @@ app.use(morgan('combined', {
   stream: { write: (message) => logger.info(message.trim()) }
 }));
 
-// Serve static files from React build (adjust path for build structure)
-app.use(express.static(path.join(__dirname, '../../../src/client/dist')));
+// v0 loader route: redirect to v0 UI if configured, else fall back to legacy UI
+app.get('/', (req, res, next) => {
+  const v0Port = process.env.V0_PORT;
+  if (v0Port) {
+    // Lightweight loader that will navigate to v0 UI
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`<!doctype html><html><head><meta charset="utf-8"><title>Loading Task Tracker...</title><meta http-equiv="X-UA-Compatible" content="IE=edge"/></head><body style="font-family:system-ui,Segoe UI,Arial;padding:24px"><h2>Launching Task Manager UI...</h2><p>If this takes more than a few seconds, the legacy UI will open automatically.</p><noscript><p>JavaScript is required. <a href="/legacy">Open legacy UI</a></p></noscript><script src="/loader.js?v0=${encodeURIComponent(String(v0Port))}"></script></body></html>`);
+    return;
+  }
+  next();
+});
+
+// External loader script to comply with CSP
+app.get('/loader.js', (req, res) => {
+  const v0Port = parseInt(String(req.query.v0 || ''), 10) || 5000;
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.send(`(function(){var port=${JSON.stringify(v0Port)};var attempts=0;function ping(){attempts++;fetch('http://localhost:'+port+'/',{mode:'no-cors'}).then(function(){location.href='http://localhost:'+port+'/';}).catch(function(){if(attempts<40){setTimeout(ping,250);}else{location.href='/legacy';}});}ping();})();`);
+});
+
+// Serve static files from React build
+// Primary: serve from root with maxAge for production performance
+const clientDistPath = path.join(__dirname, '../../../src/client/dist');
+app.use(express.static(clientDistPath, { 
+  maxAge: '1d',
+  etag: true,
+  lastModified: true
+}));
+// Alias: also serve at /resources/app for Neutralino compatibility
+app.use('/resources/app', express.static(clientDistPath, {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true
+}));
+// Serve v0 static export at /v0 when available
+app.use('/v0', express.static(path.join(__dirname, '../../../v0-task-manager-ui/out')));
+// Ensure Next assets resolve whether prefixed or not
+app.use('/_next', express.static(path.join(__dirname, '../../../v0-task-manager-ui/out/_next')));
 
 // API routes are set up in the startServer function
 
@@ -189,10 +225,15 @@ async function startServer() {
       app.get('/api/health', performanceMiddleware.healthCheck());
     });
 
-    // Serve React app for all non-API routes (must be after API routes)
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../../src/client/dist/index.html'));
-    });
+// Legacy UI explicit route
+app.get('/legacy', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
+// Serve React app for all non-API routes (must be after API routes)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
     // Get port from environment or use default
     const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8001;
@@ -209,6 +250,13 @@ async function startServer() {
       
       // Force garbage collection if available to optimize memory
       performanceMonitor.forceGarbageCollection();
+      
+      // Auto-launch Neutralino UI when running as packaged exe
+      // Detect if we're running from dist-exe (packaged) vs dev environment
+      const isPackaged = __dirname.includes('dist-exe') || process.pkg !== undefined;
+      if (isPackaged) {
+        setTimeout(() => launchNeutralinoUI(), 1000); // Wait 1s for server to be ready
+      }
     });
 
     // Set up instance communication for window focusing
@@ -263,6 +311,31 @@ async function startServer() {
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
+}
+
+// Launch Neutralino UI
+function launchNeutralinoUI() {
+  const { spawn } = require('child_process');
+  const fs = require('fs');
+  
+  // When packaged with pkg, look in the same directory as the executable
+  const exeDir = path.dirname(process.execPath);
+  const uiPath = path.join(exeDir, 'task-tracker.exe');
+  
+  if (!fs.existsSync(uiPath)) {
+    logger.warn(`Neutralino UI not found at ${uiPath}, skipping auto-launch`);
+    return;
+  }
+  
+  logger.info('Launching Neutralino UI...');
+  const uiProcess = spawn(uiPath, [], {
+    detached: true,
+    stdio: 'ignore',
+    cwd: exeDir
+  });
+  
+  uiProcess.unref(); // Allow server to exit independently
+  logger.info('UI launched successfully');
 }
 
 // Set up event handlers for background services (with optional tray service)

@@ -102,11 +102,13 @@ export class PerformanceMiddleware {
         
         if (duration > budget) {
           logger.warn(`Performance budget exceeded: ${endpoint} took ${duration.toFixed(2)}ms (budget: ${budget}ms)`);
-          
-          // Add warning header
-          res.setHeader('X-Performance-Warning', `Budget exceeded: ${duration.toFixed(2)}ms > ${budget}ms`);
+
+          // Add warning header only if headers haven't been sent
+          if (!res.headersSent) {
+            res.setHeader('X-Performance-Warning', `Budget exceeded: ${duration.toFixed(2)}ms > ${budget}ms`);
+          }
         }
-        
+
         return originalEnd.call(this, chunk, encoding);
       };
 
@@ -136,10 +138,12 @@ export class PerformanceMiddleware {
         if (memoryAfter.rss > 70 * 1024 * 1024) { // 70MB threshold
           self.performanceMonitor.forceGarbageCollection();
         }
-        
-        // Add memory usage header
-        res.setHeader('X-Memory-Delta', `${(memoryDelta / 1024 / 1024).toFixed(2)}MB`);
-        
+
+        // Add memory usage header only if headers haven't been sent
+        if (!res.headersSent) {
+          res.setHeader('X-Memory-Delta', `${(memoryDelta / 1024 / 1024).toFixed(2)}MB`);
+        }
+
         return originalEnd.call(this, chunk, encoding);
       };
 

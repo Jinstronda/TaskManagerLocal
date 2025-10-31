@@ -22,6 +22,8 @@ console.log(`Vite proxy configured for backend port: ${backendPort}`);
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Assets served from root - Express handles both / and /resources/app/ paths
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -50,18 +52,57 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info']
+      }
+    },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          charts: ['recharts'],
-          icons: ['lucide-react'],
-          utils: ['dayjs', 'clsx']
-        }
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor-react'
+          }
+          // Router
+          if (id.includes('node_modules/react-router')) {
+            return 'vendor-router'
+          }
+          // Charts - split into separate chunk
+          if (id.includes('node_modules/recharts')) {
+            return 'charts'
+          }
+          // Icons - lazy loaded with pages
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons'
+          }
+          // State management
+          if (id.includes('node_modules/zustand')) {
+            return 'vendor-state'
+          }
+          // Utilities
+          if (id.includes('node_modules/dayjs') || id.includes('node_modules/clsx')) {
+            return 'utils'
+          }
+          // All other node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor-misc'
+          }
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
-    }
+    },
+    chunkSizeWarningLimit: 600,
+    assetsInlineLimit: 4096
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'zustand', 'dayjs']
+    include: ['react', 'react-dom', 'zustand', 'dayjs', 'react-router-dom'],
+    exclude: ['recharts']
   }
 })

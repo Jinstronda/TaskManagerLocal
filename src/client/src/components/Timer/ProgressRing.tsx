@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 interface ProgressRingProps {
   progress: number; // 0-100
@@ -10,7 +10,7 @@ interface ProgressRingProps {
   className?: string;
 }
 
-export const ProgressRing: React.FC<ProgressRingProps> = ({
+export const ProgressRing: React.FC<ProgressRingProps> = React.memo(({
   progress,
   color,
   size,
@@ -19,10 +19,17 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
   isPaused,
   className,
 }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  // Memoize calculations to prevent re-computation on every render
+  const { radius, circumference, strokeDasharray, strokeDashoffset } = useMemo(() => {
+    const r = (size - strokeWidth) / 2;
+    const c = r * 2 * Math.PI;
+    return {
+      radius: r,
+      circumference: c,
+      strokeDasharray: c,
+      strokeDashoffset: c - (progress / 100) * c
+    };
+  }, [size, strokeWidth, progress]);
 
   return (
     <div className={className}>
@@ -79,4 +86,6 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
       </svg>
     </div>
   );
-};
+});
+
+ProgressRing.displayName = 'ProgressRing';

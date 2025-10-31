@@ -4,8 +4,11 @@ src/client/node_modules/
 
 # Build outputs
 dist/
+dist-exe/
 src/client/dist/
 build/
+v0-task-manager-ui/.next/
+v0-task-manager-ui/out/
 
 # Database files (potential personal data)
 database/
@@ -36,6 +39,7 @@ coverage/
 
 # Dependency directories
 jspm_packages/
+v0-task-manager-ui/node_modules/
 
 # Optional npm cache directory
 .npm
@@ -103,6 +107,7 @@ daemon/
 # Package outputs
 *.exe
 *.msi
+bin/
 
 # Temporary files
 tmp/

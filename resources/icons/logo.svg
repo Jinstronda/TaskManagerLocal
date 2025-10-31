@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)"/>
+
+  <!-- Shadow effect -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="4"/>
+
+  <!-- Clipboard/Document shape -->
+  <rect x="140" y="100" width="232" height="312" rx="20" fill="white" opacity="0.95"/>
+
+  <!-- Clipboard clip at top -->
+  <rect x="216" y="80" width="80" height="40" rx="8" fill="#E0E7FF"/>
+  <rect x="220" y="84" width="72" height="32" rx="6" fill="white"/>
+
+  <!-- Task lines (uncompleted) -->
+  <rect x="180" y="160" width="152" height="16" rx="8" fill="#E5E7EB"/>
+  <rect x="180" y="220" width="152" height="16" rx="8" fill="#E5E7EB"/>
+
+  <!-- Checkboxes (uncompleted) -->
+  <rect x="180" y="160" width="20" height="20" rx="4" fill="white" stroke="#D1D5DB" stroke-width="2"/>
+  <rect x="180" y="220" width="20" height="20" rx="4" fill="white" stroke="#D1D5DB" stroke-width="2"/>
+
+  <!-- Completed task line -->
+  <rect x="180" y="280" width="152" height="16" rx="8" fill="#D1FAE5"/>
+
+  <!-- Completed checkbox with checkmark -->
+  <rect x="180" y="280" width="20" height="20" rx="4" fill="url(#checkGradient)"/>
+  <path d="M 184 290 L 188 294 L 196 284" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Timer/Clock icon in corner -->
+  <circle cx="340" cy="360" r="32" fill="#4F46E5" opacity="0.9"/>
+  <circle cx="340" cy="360" r="26" fill="white"/>
+  <line x1="340" y1="360" x2="340" y2="346" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/>
+  <line x1="340" y1="360" x2="350" y2="365" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/>
+</svg>

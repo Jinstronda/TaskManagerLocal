@@ -1,0 +1,56 @@
+{
+  "applicationId": "com.tasktracker.local",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "port": 0,
+  "url": "http://localhost:8765/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": true,
+    "writeToLogFile": true
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.*",
+    "filesystem.*",
+    "storage.*",
+    "window.*",
+    "events.*",
+    "extensions.*",
+    "debug.*",
+    "computer.*"
+  ],
+  "globalVariables": {
+    "DB_PATH": "database/task_tracker.db"
+  },
+  "modes": {
+    "window": {
+      "title": "Task Tracker",
+      "width": 1200,
+      "height": 800,
+      "minWidth": 800,
+      "minHeight": 600,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/resources/icons/appIcon.png",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": true,
+      "center": true,
+      "useSavedState": false
+    }
+  },
+  "cli": {
+    "binaryName": "task-tracker",
+    "resourcesPath": "/resources/",
+    "extensionsPath": "/extensions/",
+    "clientLibrary": "/resources/js/neutralino.js",
+    "binaryVersion": "5.4.0",
+    "clientVersion": "5.4.0"
+  }
+}
