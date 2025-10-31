@@ -129,30 +129,11 @@ function copyNeutralinoBinary() {
   console.log('✓ Neutralino binary copied\n');
 }
 
-// Step 6: Build Neutralino resources
-function buildNeutralinoResources() {
-  console.log('[6/6] Building Neutralino resources...');
-  
-  return new Promise((resolve, reject) => {
-    // Create resources.neu file
-    const neu = spawn('npx', ['--yes', '@neutralinojs/neu', 'build', '--release'], {
-      cwd: DIST_DIR,
-      shell: true,
-      stdio: 'inherit'
-    });
-    
-    neu.on('close', (code) => {
-      if (code === 0) {
-        console.log('✓ Neutralino resources built\n');
-        createReadme();
-        resolve();
-      } else {
-        console.warn('⚠ Neutralino resource build failed, app may still work\n');
-        createReadme();
-        resolve(); // Don't fail the build
-      }
-    });
-  });
+// Step 6: Finalize distribution
+function finalizeDistribution() {
+  console.log('[6/6] Finalizing distribution...');
+  createReadme();
+  console.log('✓ Distribution ready\n');
 }
 
 // Create README
@@ -209,7 +190,7 @@ async function build() {
     await packageServer();
     copyClientResources();
     copyNeutralinoBinary();
-    await buildNeutralinoResources();
+    finalizeDistribution();
     
     console.log('═══════════════════════════════════════════════════');
     console.log('✓ Build Complete!');
@@ -218,7 +199,7 @@ async function build() {
     console.log('Files created:');
     console.log('  TaskTracker.exe      (main - double-click this)');
     console.log('  task-tracker.exe     (UI window - auto-launched)');
-    console.log('  resources.neu        (bundled UI assets)');
+    console.log('  resources/           (UI assets)');
     console.log('  database/            (created on first run)\n');
     console.log('To distribute: Zip the dist-exe folder\n');
     
