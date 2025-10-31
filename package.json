@@ -6,11 +6,6 @@
   "scripts": {
     "app": "node launch-app.js",
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
-    "web:v0": "cd v0-task-manager-ui && npm install --legacy-peer-deps --no-audit && npm run dev -- -p 4000 -H 127.0.0.1",
-    "dev:v0": "set V0_PORT=4000&& concurrently \"npm run server:dev\" \"npm run web:v0\"",
-    "dev:safe": "node scripts/dev-startup.js",
-    "dev:smart": "node scripts/smart-dev.js",
-    "health": "node scripts/health-check.js",
     "server:dev": "nodemon --exec \"node --expose-gc --max-old-space-size=400 -r ts-node/register src/server/index.ts\"",
     "client:dev": "cd src/client && npm run dev",
     "build": "npm run build:server && npm run build:client",
@@ -19,19 +14,7 @@
     "build:exe": "node scripts/build-exe.js",
     "check:build": "node scripts/check-build-ready.js",
     "start": "node --max_old_space_size=80 --max_semi_space_size=8 --optimize_for_size --expose-gc dist/server/server/index.js",
-    "start:production": "node --max_old_space_size=80 --max_semi_space_size=8 --optimize_for_size --expose-gc dist/server/server/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:performance": "jest --testNamePattern=\"performance|Performance\"",
-    "create:installer": "node create-installer.js",
-    "install:service": "node dist/server/server/install-service.js",
-    "uninstall:service": "node dist/server/server/uninstall-service.js",
-    "performance:monitor": "node --expose-gc dist/server/server/index.js",
-    "performance:profile": "node --prof --expose-gc dist/server/server/index.js",
-    "instances:status": "node scripts/check-instances.js status",
-    "instances:kill": "node scripts/check-instances.js kill",
-    "instances:cleanup": "node scripts/check-instances.js cleanup",
-    "instances:focus": "node scripts/check-instances.js focus"
+    "test": "jest"
   },
   "keywords": [
     "productivity",
@@ -55,31 +38,19 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.8",
-    "@types/jsdom": "^21.1.7",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.5",
     "@types/sqlite3": "^3.1.11",
     "concurrently": "^8.2.2",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^30.1.2",
-    "jsdom": "^27.0.0",
-    "nodemon": "^3.0.2",
-    "pkg": "^5.8.1",
-    "playwright": "^1.55.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
-  },
-  "pkg": {
-    "assets": [
-      "src/client/dist/**/*",
-      "database/**/*"
-    ],
-    "outputPath": "dist"
+    "typescript": "^5.3.3",
+    "nodemon": "^3.0.2",
+    "pkg": "^5.8.1"
   }
 }

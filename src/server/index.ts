@@ -27,7 +27,6 @@ import { performanceMiddleware } from './middleware/performanceMiddleware';
 import { logger } from './utils/logger';
 import { PerformanceMonitor } from './utils/PerformanceMonitor';
 import { portManager } from './utils/PortManager';
-import { singleInstanceManager } from './utils/SingleInstanceManager';
 
 // Initialize performance monitoring
 const performanceMonitor = PerformanceMonitor.getInstance();
@@ -93,6 +92,13 @@ app.use(morgan('combined', {
   stream: { write: (message) => logger.info(message.trim()) }
 }));
 
+// Determine client path early (needed for static file serving)
+const isPackaged = (process as any).pkg !== undefined;
+const exeDir = isPackaged ? path.dirname(process.execPath) : process.cwd();
+const clientDistPath = isPackaged 
+  ? path.join(exeDir, 'resources', 'app')
+  : path.join(__dirname, '../../../src/client/dist');
+
 // v0 loader route: redirect to v0 UI if configured, else fall back to legacy UI
 app.get('/', (req, res, next) => {
   const v0Port = process.env.V0_PORT;
@@ -113,8 +119,8 @@ app.get('/loader.js', (req, res) => {
 });
 
 // Serve static files from React build
-// Primary: serve from root with maxAge for production performance
-const clientDistPath = path.join(__dirname, '../../../src/client/dist');
+logger.info(`Serving client from: ${clientDistPath}`);
+
 app.use(express.static(clientDistPath, { 
   maxAge: '1d',
   etag: true,
@@ -127,9 +133,9 @@ app.use('/resources/app', express.static(clientDistPath, {
   lastModified: true
 }));
 // Serve v0 static export at /v0 when available
-app.use('/v0', express.static(path.join(__dirname, '../../../v0-task-manager-ui/out')));
-// Ensure Next assets resolve whether prefixed or not
-app.use('/_next', express.static(path.join(__dirname, '../../../v0-task-manager-ui/out/_next')));
+const v0Path = path.join(exeDir, 'v0-task-manager-ui', 'out');
+app.use('/v0', express.static(v0Path));
+app.use('/_next', express.static(path.join(v0Path, '_next')));
 
 // API routes are set up in the startServer function
 
@@ -139,20 +145,6 @@ app.use(errorHandler);
 // Initialize database and start server with performance optimization
 async function startServer() {
   try {
-    // Check for existing instance first
-    const lockAcquired = await singleInstanceManager.acquireLock();
-    if (!lockAcquired) {
-      logger.info('Another instance of Local Task Tracker is already running');
-      
-      // Try to notify the existing instance to focus/show window
-      const notified = await singleInstanceManager.notifyExistingInstance('focus');
-      if (notified) {
-        logger.info('Notified existing instance to focus');
-      }
-      
-      logger.info('Exiting to prevent duplicate instances');
-      process.exit(0);
-    }
     // Initialize database with performance monitoring
     const dbManager = await performanceMonitor.measureOperation('databaseInit', async () => {
       const manager = DatabaseManager.getInstance();
@@ -225,18 +217,18 @@ async function startServer() {
       app.get('/api/health', performanceMiddleware.healthCheck());
     });
 
-// Legacy UI explicit route
-app.get('/legacy', (req, res) => {
-  res.sendFile(path.join(clientDistPath, 'index.html'));
-});
+    // Legacy UI explicit route
+    app.get('/legacy', (req, res) => {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
 
-// Serve React app for all non-API routes (must be after API routes)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(clientDistPath, 'index.html'));
-});
+    // Serve React app for all non-API routes (must be after API routes)
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
 
     // Get port from environment or use default
-    const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8001;
+    const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8765;
     const server = app.listen(port, () => {
       performanceMonitor.markStartupComplete();
       logger.info(`Server running on http://localhost:${port}`);
@@ -259,16 +251,6 @@ app.get('*', (req, res) => {
       }
     });
 
-    // Set up instance communication for window focusing
-    singleInstanceManager.setupInstanceCommunication((message) => {
-      if (message.action === 'focus' && systemTrayService) {
-        // Focus the application window if possible
-        systemTrayService.showTrayNotification(
-          'Local Task Tracker',
-          'Application is already running. Click to focus.'
-        );
-      }
-    });
 
     // Graceful shutdown with cleanup
     const shutdown = async () => {
@@ -288,9 +270,6 @@ app.get('*', (req, res) => {
         
         // Cleanup port configuration
         await portManager.cleanupPortConfig();
-        
-        // Release single instance lock
-        await singleInstanceManager.releaseLock();
         
         // Close server
         server.close(() => {

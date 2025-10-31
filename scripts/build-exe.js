@@ -101,9 +101,9 @@ function copyClientResources() {
   console.log('✓ Client resources copied\n');
 }
 
-// Step 5: Copy Neutralino binary
+// Step 5: Copy Neutralino binary and build resources
 function copyNeutralinoBinary() {
-  console.log('[5/5] Copying Neutralino binary...');
+  console.log('[5/6] Copying Neutralino binary...');
   
   const neutralinoBin = path.join(process.cwd(), 'bin', 'neutralino-win_x64.exe');
   const destBin = path.join(DIST_DIR, 'task-tracker.exe');
@@ -118,7 +118,7 @@ function copyNeutralinoBinary() {
   const config = path.join(process.cwd(), 'neutralino.config.json');
   if (fs.existsSync(config)) {
     const configContent = JSON.parse(fs.readFileSync(config, 'utf8'));
-    // Update URL to use localhost (server will be started by launcher)
+    // Update URL to point to server
     configContent.url = 'http://localhost:8765/';
     fs.writeFileSync(
       path.join(DIST_DIR, 'neutralino.config.json'),
@@ -127,9 +127,32 @@ function copyNeutralinoBinary() {
   }
   
   console.log('✓ Neutralino binary copied\n');
+}
+
+// Step 6: Build Neutralino resources
+function buildNeutralinoResources() {
+  console.log('[6/6] Building Neutralino resources...');
   
-  // Create simple README
-  createReadme();
+  return new Promise((resolve, reject) => {
+    // Create resources.neu file
+    const neu = spawn('npx', ['--yes', '@neutralinojs/neu', 'build', '--release'], {
+      cwd: DIST_DIR,
+      shell: true,
+      stdio: 'inherit'
+    });
+    
+    neu.on('close', (code) => {
+      if (code === 0) {
+        console.log('✓ Neutralino resources built\n');
+        createReadme();
+        resolve();
+      } else {
+        console.warn('⚠ Neutralino resource build failed, app may still work\n');
+        createReadme();
+        resolve(); // Don't fail the build
+      }
+    });
+  });
 }
 
 // Create README
@@ -186,6 +209,7 @@ async function build() {
     await packageServer();
     copyClientResources();
     copyNeutralinoBinary();
+    await buildNeutralinoResources();
     
     console.log('═══════════════════════════════════════════════════');
     console.log('✓ Build Complete!');
@@ -194,7 +218,7 @@ async function build() {
     console.log('Files created:');
     console.log('  TaskTracker.exe      (main - double-click this)');
     console.log('  task-tracker.exe     (UI window - auto-launched)');
-    console.log('  resources/           (UI assets)');
+    console.log('  resources.neu        (bundled UI assets)');
     console.log('  database/            (created on first run)\n');
     console.log('To distribute: Zip the dist-exe folder\n');
     
