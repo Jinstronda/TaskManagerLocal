@@ -118,8 +118,9 @@ function copyNeutralinoBinary() {
   const config = path.join(process.cwd(), 'neutralino.config.json');
   if (fs.existsSync(config)) {
     const configContent = JSON.parse(fs.readFileSync(config, 'utf8'));
-    // Update URL to point to server
+    // Update config for packaged exe
     configContent.url = 'http://localhost:8765/';
+    configContent.enableServer = false; // Disable Neutralino's server, use Express instead
     fs.writeFileSync(
       path.join(DIST_DIR, 'neutralino.config.json'),
       JSON.stringify(configContent, null, 2)
