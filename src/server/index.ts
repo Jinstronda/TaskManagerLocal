@@ -27,6 +27,7 @@ import { performanceMiddleware } from './middleware/performanceMiddleware';
 import { logger } from './utils/logger';
 import { PerformanceMonitor } from './utils/PerformanceMonitor';
 import { portManager } from './utils/PortManager';
+import { singleInstanceManager } from './utils/SingleInstanceManager';
 
 // Initialize performance monitoring
 const performanceMonitor = PerformanceMonitor.getInstance();
@@ -145,6 +146,13 @@ app.use(errorHandler);
 // Initialize database and start server with performance optimization
 async function startServer() {
   try {
+    // Check for existing instance first
+    const lockAcquired = await singleInstanceManager.acquireLock();
+    if (!lockAcquired) {
+      logger.info('Another instance is already running. Exiting.');
+      process.exit(0);
+    }
+    
     // Initialize database with performance monitoring
     const dbManager = await performanceMonitor.measureOperation('databaseInit', async () => {
       const manager = DatabaseManager.getInstance();
@@ -229,7 +237,21 @@ async function startServer() {
 
     // Get port from environment or use default
     const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8765;
-    const server = app.listen(port, () => {
+    
+    // Handle port already in use gracefully
+    const server = app.listen(port);
+    
+    server.on('error', (err: any) => {
+      if (err.code === 'EADDRINUSE') {
+        logger.warn(`Port ${port} already in use. Another instance may be running.`);
+        process.exit(0); // Exit silently
+      } else {
+        logger.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+    
+    server.on('listening', () => {
       performanceMonitor.markStartupComplete();
       logger.info(`Server running on http://localhost:${port}`);
       logger.info('Local Task Tracker API ready');
@@ -270,6 +292,9 @@ async function startServer() {
         
         // Cleanup port configuration
         await portManager.cleanupPortConfig();
+        
+        // Release single instance lock
+        await singleInstanceManager.releaseLock();
         
         // Close server
         server.close(() => {

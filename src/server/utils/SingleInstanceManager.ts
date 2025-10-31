@@ -256,6 +256,12 @@ export class SingleInstanceManager {
   public setupInstanceCommunication(onMessage: (message: any) => void): void {
     if (this.lockServer) {
       this.lockServer.on('connection', (socket) => {
+        // Add error handler to prevent crashes
+        socket.on('error', (err) => {
+          // Silently ignore connection errors (ECONNRESET, etc)
+          logger.debug('Socket error (ignored):', err.message);
+        });
+        
         socket.on('data', (data) => {
           try {
             const message = JSON.parse(data.toString());
